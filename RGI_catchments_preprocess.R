@@ -71,7 +71,7 @@ RGI  <- list(st_read("GIS South/Glaciers/RGI6.shp"), st_read("GIS South/Glaciers
 
 dem <- rast("GIS South/dem_patagonia3f.tif")
 dem <- project(dem, "epsg:32718", method = "bilinear")
-dem <- subst(dem, NA, 0)  0 # NAs to sea level (= 0)
+dem <- subst(dem, NA, 0)  # NAs to sea level (= 0)
 
 for (i in 1:2) { 
   RGI_i  <- subset(RGI[[i]], RGI[[i]]$CenLat < -40.5)
