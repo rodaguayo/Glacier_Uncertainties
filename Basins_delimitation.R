@@ -1,5 +1,5 @@
-2# Code for basin delimitation  -------------------------------------------------------------------
-# Developed by Rodrigo Aguayo (2020-2022)
+# Code for basin delimitation  -------------------------------------------------------------------
+# Developed by Rodrigo Aguayo (2022-2023)
 
 rm(list=ls())
 cat("\014")  
@@ -42,8 +42,8 @@ all_basins <- subset(all_basins, (all_basins$lon < -68.5))
 all_basins <- subset(all_basins, all_basins$area > 10)
 plot(all_basins)
 
-glaciers6 <- vect("GIS South/Glaciers/RGI6_v2.shp")
-glaciers7 <- vect("GIS South/Glaciers/RGI7_v2.shp")
+glaciers6 <- vect("GIS South/Glaciers/RGI6.shp") # use the raw RGI file
+glaciers7 <- vect("GIS South/Glaciers/RGI7.shp")
 glaciers6 <- rasterize(glaciers6, project(dem, "EPSG:4326"), background = 0) * 100
 glaciers7 <- rasterize(glaciers7, project(dem, "EPSG:4326"), background = 0) * 100
 glaciers  <- max(glaciers6, glaciers7)
@@ -51,14 +51,11 @@ glaciers  <- max(glaciers6, glaciers7)
 all_basins$glacier_cover <- extract(glaciers, all_basins, "mean")[,2] 
 all_basins <- subset(all_basins, all_basins$glacier_cover > 0.1) # 0.1%
 
-all_basins$file16212f2b9905 <- NULL
-all_basins$file1cf0e63335d59 <- NULL
-all_basins$ID <- seq(1, nrow(all_basins))
+all_basins$ID <- seq(0, nrow(all_basins)-1)
 
 # Assing code to all basins
 all_basins <- st_as_sf(all_basins)
-all_basins$Zone <- 0 #Initilizate
-
+all_basins$Zone <- 0 #Initialization
 
 all_basins$Zone <- ifelse(all_basins$lat > -43.4, 1, all_basins$Zone)
 all_basins$Zone <- ifelse(all_basins$lat < -43.4 & all_basins$lat > -46,    2, all_basins$Zone)
@@ -74,8 +71,10 @@ all_basins$Zone <- ifelse(all_basins$lat < -52.1 & all_basins$lat > -54.1 , 8, a
 all_basins$Zone <- ifelse(all_basins$lat < -54.1, 9, all_basins$Zone)
 
 glaciers6 <- vect("GIS South/Glaciers/RGI6_v2.shp")
-all_basins$glacier_n <-lengths(sf::st_intersects(all_basins, st_as_sf(centroids(glaciers6))   ))
+all_basins$glacier_n <-lengths(sf::st_intersects(all_basins, st_as_sf(centroids(glaciers6))))
 
+# delete trash from GRASS (file12135term1k2 etc)
+all_basins <- all_basins[,c("area", "lat", "lon", "glacier_cover", "ID", "geometry", "Zone", "glacier_n")]
 
 writeVector(vect(all_basins), "GIS South/Basins_Patagonia_all.shp", overwrite=TRUE)
 plot(all_basins)
