@@ -14,8 +14,6 @@ library("dplyr")
 library("sf")
 sf_use_s2(FALSE)
 
-setwd("/home/rooda/Dropbox/Patagonia/")
-
 # 1. Delimitation of all basins -------------------------------------------------------------------
 dem        <- rast("GIS South/dem_patagonia3f.tif") # DEM from NASADEM 90m
 dem        <- aggregate(dem, fact=2, fun="mean")
@@ -230,6 +228,3 @@ RGI7$src_date <- paste0(substr(RGI7$src_date, 0,4), substr(RGI7$src_date, 6,7), 
 # save using terra (problems in sf)
 writeVector(vect(RGI6), "GIS South/Glaciers/RGI6_v2.shp", overwrite=TRUE)
 writeVector(vect(RGI7), "GIS South/Glaciers/RGI7_v2.shp", overwrite=TRUE)
-
-
-
