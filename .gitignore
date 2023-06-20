@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# folder
+Old/
+Figures/slides/
+
 # Distribution / packaging
 .Python
 build/
@@ -130,3 +134,4 @@ dmypy.json
 .Rproj.user
 .RData
 .Rhistory
+**/*.Rproj
