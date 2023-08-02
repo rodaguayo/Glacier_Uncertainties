@@ -5,6 +5,7 @@ rm(list=ls())
 cat("\014")  
 
 setwd("/home/rooda/Dropbox/Patagonia/")
+#setwd("C:/Users/rooda/Dropbox/Patagonia/")
 
 library("exactextractr")
 library("rgrass")
@@ -187,10 +188,9 @@ for (i in sort(unique(RGI6$Zone))) { # VAS based on F19 data
 
 ## 6.3 dmdtda: specific-mass change rate in meters water-equivalent per year ----------------------
 dhdt_21   <- rast("GIS South/Glaciers/dhdt_2021.tif")
-dhdt_e21  <- rast("GIS South/Glaciers/dhdt_error_2021.tif")
-dhdt_oggm <- read.csv("MS2 Results/dhdt_origin_theia.csv")
-dhdt_oggm <- subset(dhdt_oggm, dhdt_oggm$period == "2000-01-01_2020-01-01")
-dhdt_oggm <- dhdt_oggm[dhdt_oggm$rgiid %in% RGI6$RGIId,] # same order
+dhdt_source <- read.csv("MS2 Results/dhdt_origin_theia.csv")
+dhdt_source <- subset(dhdt_source, dhdt_source$period == "2000-01-01_2020-01-01")
+dhdt_source <- dhdt_source[dhdt_source$rgiid %in% RGI6$RGIId,] # same order
 
 RGI6$dmdtda_21  <- exact_extract(dhdt_21,  RGI6, "mean") * 0.850 # dhdt to dmdtda
 RGI7$dmdtda_21  <- exact_extract(dhdt_21,  RGI7, "mean") * 0.850 
@@ -199,10 +199,8 @@ RGI7$dmdtda_21c <- round(exact_extract(not.na(dhdt_21),  RGI7, "mean"), 3)
 RGI6$dmdtda_21[RGI6$dmdtda_21c < 0.9] <- NA
 RGI7$dmdtda_21[RGI7$dmdtda_21c < 0.9] <- NA
 
-RGI6$dmdtda_error_21  <- exact_extract(dhdt_e21,  RGI6, "mean") * 0.850 
-RGI7$dmdtda_error_21  <- exact_extract(dhdt_e21,  RGI7, "mean") * 0.850 
-RGI6$dmdtda_error_21[RGI6$dmdtda_21c < 0.9] <- NA
-RGI7$dmdtda_error_21[RGI7$dmdtda_21c < 0.9] <- NA
+RGI6$dmdtda_error  <- dhdt_source$err_dmdtda
+
 
 ## 6.3.1  Filling: Every glacier needs to have a dhdt (dmdadt) ------------------------------------
 dmdtda_RGI6_mean <- sapply(split(RGI6, RGI6$Zone), function(d) weighted.mean(d$dmdtda_21, w = d$area_km2, na.rm = T)) # area-weighted is better :)
